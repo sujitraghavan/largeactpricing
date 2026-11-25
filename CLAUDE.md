@@ -152,14 +152,28 @@ Tests cover:
 
 ---
 
-## Next Development Steps (from SPEC.md)
+## Next Development Steps (completed + remaining)
 
-1. Wire `/api/v1/rate` to fetch model params from Supabase (not in-memory)
-2. Complete `POST /api/v1/loss-run/upload` (CSV/Excel parsing in `app/services.py`)
-3. Implement `QuoteStore` for quote persistence
-4. Build HTMX templates (`app/templates/`) for 4-step UI
-5. Run seed scripts against live Supabase
-6. Alembic migration for initial schema
+The following steps from the original roadmap are now **complete**:
+
+1. **Wire `/api/v1/rate` to fetch model params from Supabase** ✅ — `main.py` calls `load_model_parameters()` which fetches from DB via `params_loader.py`. Alembic migration (`0001_initial_schema.py`) is ready for `alembic upgrade head`.
+2. **Complete `POST /api/v1/loss-run/upload`** ✅ — Endpoint in `main.py` + parser in `app/services/loss_run.py`. All 12 tests pass (6 engine + 6 API).
+3. **Implement `QuoteStore` for quote persistence** ✅ — `app/services/quote_store.py` with `save_quote()` and `get_quote()`. Endpoint `/api/v1/quotes/save` wired in `main.py`.
+
+The following steps remain to be run against a live Supabase instance:
+
+4. **Run seed scripts against live Supabase** — Configure `.env` with Supabase creds, then:
+   ```bash
+   alembic upgrade head
+   python scripts/seed_ldf_ler.py
+   python scripts/seed_state_rules.py
+   ```
+5. **Build full HTMX 4-step UI** ✅ — All 4 templates created (`step1_account.html` through `step4_results.html`).
+6. **Wire step4 save button to real API** ✅ — `step4_results.html` fetches from `/api/v1/rate` on load; save button calls `/api/v1/quotes/save`.
+
+**Remaining after seed scripts:**
+- Test end-to-end with real Supabase connection
+- Add authentication/authorization (non-goal for v1)
 
 ---
 

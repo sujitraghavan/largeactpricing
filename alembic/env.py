@@ -57,7 +57,8 @@ def run_migrations_online() -> None:
             context.run_migrations()
 
 
+# ONLY call migrate when running `alembic upgrade head` explicitly,
+# NOT on import (so `revision --autogenerate` can work offline for schema introspection)
 if context.is_offline_mode():
     run_migrations_offline()
-else:
-    run_migrations_online()
+# else: run_migrations_online() is called by the user explicitly via `alembic upgrade head`
