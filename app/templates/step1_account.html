@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Step 1: Account Terms — Commercial Auto Loss Rating</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/htmx.org@2.0.0"></script>
+  <style>
+    .btn-primary { background: #2563eb; color: white; padding: 0.75rem 1.5rem; border-radius: 0.5rem; border: none; font-weight: 600; cursor: pointer; }
+    .btn-primary:hover { background: #1d4ed8; }
+    .btn-secondary { background: #e5e7eb; color: #374151; padding: 0.75rem 1.5rem; border-radius: 0.5rem; border: none; font-weight: 500; cursor: pointer; }
+    .btn-secondary:hover { background: #d1d5db; }
+  </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+  <nav class="bg-white shadow-sm border-b border-gray-200 px-6 py-4">
+    <h1 class="text-xl font-bold text-gray-800">Commercial Auto Loss Rating</h1>
+    <div class="text-sm text-gray-600 hidden md:block">Step 1 of 4 · Account Terms</div>
+  </nav>
+
+  <div class="max-w-2xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
+    <h2 class="text-2xl font-bold text-gray-900 mb-6">Account & Policy Terms</h2>
+
+    <form hx-get="/step/2" hx-target="#app" hx-swap="innerHTML" class="bg-white p-6 rounded-xl shadow border border-gray-200 space-y-6">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Named Insured <span class="text-red-500">*</span></label>
+          <input type="text" name="account.named_insured" class="border border-gray-300 rounded p-2 w-full focus:ring-2 focus:ring-blue-500 outline-none" required placeholder="Buckeye Regional Freight">
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Primary State <span class="text-red-500">*</span></label>
+          <select name="account.primary_state" class="border border-gray-300 rounded p-2 w-full focus:ring-2 focus:ring-blue-500 outline-none" required>
+            <option value="">Select state</option>
+            <option value="OH">OH</option>
+            <option value="PA">PA</option>
+            <option value="IN">IN</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Structure</label>
+          <select name="account.structure" class="border border-gray-300 rounded p-2 w-full focus:ring-2 focus:ring-blue-500 outline-none">
+            <option value="Deductible">Deductible</option>
+            <option value="SIR">SIR</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Retention ($)</label>
+          <input type="number" name="account.retention" class="border border-gray-300 rounded p-2 w-full focus:ring-2 focus:ring-blue-500 outline-none" min="0" value="25000">
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">CSL ($)</label>
+          <input type="number" name="account.csl" class="border border-gray-300 rounded p-2 w-full focus:ring-2 focus:ring-blue-500 outline-none" min="1" value="1000000">
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Experience Cap ($)</label>
+          <input type="number" name="account.experience_cap" class="border border-gray-300 rounded p-2 w-full focus:ring-2 focus:ring-blue-500 outline-none" min="1" value="100000">
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Schedule Mod</label>
+          <input type="number" name="account.schedule_mod" class="border border-gray-300 rounded p-2 w-full focus:ring-2 focus:ring-blue-500 outline-none" step="0.01" value="-0.08">
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Credibility Std Claims</label>
+          <input type="number" name="account.full_credibility_claim_count" class="border border-gray-300 rounded p-2 w-full focus:ring-2 focus:ring-blue-500 outline-none" min="1" value="1084">
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Fixed Expense / Unit ($)</label>
+          <input type="number" name="account.fixed_expense_per_unit" class="border border-gray-300 rounded p-2 w-full focus:ring-2 focus:ring-blue-500 outline-none" min="0" value="85">
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Expiring Premium / Unit ($)</label>
+          <input type="number" name="account.expiring_premium_per_unit" class="border border-gray-300 rounded p-2 w-full focus:ring-2 focus:ring-blue-500 outline-none" min="0" value="3800">
+        </div>
+      </div>
+
+      <div class="flex justify-between items-center pt-6 border-t border-gray-200">
+        <div class="text-sm text-gray-500">All model inputs are editable. Gray fields carry defaults.</div>
+        <button type="submit" class="btn-primary">Next: Fleet Exposures →</button>
+      </div>
+    </form>
+  </div>
+</body>
+</html>

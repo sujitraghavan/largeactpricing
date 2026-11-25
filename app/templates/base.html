@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Commercial Auto Loss Rating</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/htmx.org@2.0.0"></script>
+  <style>
+    .step { display: none; }
+    .step.active { display: block; }
+    .step-transition { transition: all 0.3s ease; }
+    .btn-primary { background: #2563eb; color: white; padding: 0.75rem 1.5rem; border-radius: 0.5rem; border: none; font-weight: 600; cursor: pointer; }
+    .btn-primary:hover { background: #1d4ed8; }
+    .btn-secondary { background: #e5e7eb; color: #374151; padding: 0.75rem 1.5rem; border-radius: 0.5rem; border: none; font-weight: 500; cursor: pointer; }
+    .btn-secondary:hover { background: #d1d5db; }
+    .progress-bar { height: 4px; background: #e5e7eb; border-radius: 2px; overflow: hidden; }
+    .progress-fill { height: 100%; background: #2563eb; transition: width 0.3s ease; }
+  </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+  <nav class="bg-white shadow-sm border-b border-gray-200 px-6 py-4">
+    <div class="max-w-7xl mx-auto flex items-center justify-between">
+      <h1 class="text-xl font-bold text-gray-800">Commercial Auto Loss Rating</h1>
+      <div class="flex gap-4">
+        <span class="text-sm text-gray-600 hidden md:block">Large Account Pricing</span>
+        <button class="btn-secondary text-sm" onclick="location.href='/quotes'">View Saved Quotes</button>
+      </div>
+    </div>
+  </nav>
+
+  <div class="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
+    <!-- Progress indicator -->
+    <div class="mb-8">
+      <div class="progress-bar mb-2"><div class="progress-fill" id="progress-fill" style="width: 25%"></div></div>
+      <div class="flex justify-between text-sm font-medium text-gray-600">
+        <span>Step 1</span><span>Step 2</span><span>Step 3</span><span>Step 4</span>
+      </div>
+    </div>
+
+    <!-- Main content -->
+    {% block content %}{% endblock %}
+
+  </div>
+</body>
+</html>

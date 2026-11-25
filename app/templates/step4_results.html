@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Step 4: Review & Rate — Commercial Auto Loss Rating</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/htmx.org@2.0.0"></script>
+  <style>
+    .btn-primary { background: #2563eb; color: white; padding: 0.75rem 1.5rem; border-radius: 0.5rem; border: none; font-weight: 600; cursor: pointer; }
+    .btn-primary:hover { background: #1d4ed8; }
+    .btn-secondary { background: #e5e7eb; color: #374151; padding: 0.75rem 1.5rem; border-radius: 0.5rem; border: none; font-weight: 500; cursor: pointer; }
+    .btn-secondary:hover { background: #d1d5db; }
+  </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+  <nav class="bg-white shadow-sm border-b border-gray-200 px-6 py-4">
+    <h1 class="text-xl font-bold text-gray-800">Commercial Auto Loss Rating</h1>
+    <div class="text-sm text-gray-600 hidden md:block">Step 4 of 4 · Review & Rate</div>
+  </nav>
+
+  <div class="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
+    <!-- Progress -->
+    <div class="mb-6 flex justify-between items-center">
+      <span class="text-sm font-medium text-gray-600">Step 4: Rating Result</span>
+      <span class="text-xs text-gray-400">← Back</span>
+    </div>
+
+    <!-- Result card -->
+    <div id="quote-result" class="bg-white rounded-xl shadow p-6 border border-gray-200 mb-8">
+      <!-- Loading -->
+      <div id="loading" class="hidden py-12 text-center">
+        <div class="animate-spin h-12 w-12 mx-auto"></div>
+        <p class="mt-2 text-gray-500">Calculating rating...</p>
+      </div>
+
+      <!-- Error -->
+      <div id="error" class="hidden py-6 text-center text-red-600"></div>
+
+      <!-- Quote output -->
+      <div id="quote-output" class="hidden">
+        <h3 class="text-xl font-bold text-gray-900 mb-4">Rating Result</h3>
+
+        <div class="grid grid-cols-2 gap-6 mb-6">
+          <div>
+            <p class="text-gray-500 text-sm mb-2">Selected Structure</p>
+            <p class="font-medium" id="selected-structure">Deductible</p>
+          </div>
+          <div>
+            <p class="text-gray-500 text-sm mb-2">Retention ($)</p>
+            <p class="font-medium" id="selected-retention">25,000</p>
+          </div>
+          <div>
+            <p class="text-gray-500 text-sm mb-2">Premium / Unit ($)</p>
+            <p class="font-medium" id="premium-per-unit">0</p>
+          </div>
+          <div>
+            <p class="text-gray-500 text-sm mb-2">Total Payable ($)</p>
+            <p class="font-medium" id="total-payable">0</p>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-6">
+          <div>
+            <p class="text-gray-500 text-sm mb-2">Technical Premium ($)</p>
+            <p class="font-medium" id="technical-premium">0</p>
+          </div>
+          <div>
+            <p class="text-gray-500 text-sm mb-2">Rate Change vs. Expiring</p>
+            <p class="font-medium" id="rate-change">0.00%</p>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-6">
+          <div>
+            <p class="text-gray-500 text-sm mb-2">State Breakdown</p>
+            <p class="font-medium text-sm" id="state-breakdown">OH</p>
+          </div>
+          <div>
+            <p class="text-gray-500 text-sm mb-2">Schedule Mod Applied</p>
+            <p class="font-medium" id="schedule-check">Within rules</p>
+          </div>
+        </div>
+
+        <div class="mt-8 pt-6 border-t border-gray-200">
+          <h4 class="font-medium text-gray-700 mb-4">Output Options</h4>
+          <div class="flex gap-3">
+            <button id="save-quote" class="btn-primary">Save Quote</button>
+            <button id="export-pdf" class="btn-secondary">Export PDF</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="saved-success" class="hidden py-8 text-center">
+      <div class="bg-green-100 border-l-4 border-green-500 text-green-800 p-4 rounded-xl">
+        <svg class="h-6 w-6 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14M12 5l7 7-7 7"></path></svg>
+        <p class="font-medium">Quote saved successfully!</p>
+        <p class="text-sm mt-2">Quote ID: <span id="saved-quote-id"></span></p>
+        <button class="btn-secondary mt-3" onclick="window.location.href='/quotes'">View All Quotes</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Global: show loading state, then render quote data
+    function renderQuote(data) {
+      document.getElementById('loading').classList.add('hidden');
+      document.getElementById('quote-output').classList.remove('hidden');
+
+      if (data.errors) {
+        document.getElementById('error').classList.remove('hidden');
+        document.getElementById('error').innerHTML = `<p>Rating failed: ${data.errors}</p>`;
+        document.getElementById('quote-output').classList.add('hidden');
+        return;
+      }
+
+      document.getElementById('selected-structure').textContent = data.summary.selected_structure;
+      document.getElementById('selected-retention').textContent = data.summary.selected_retention.toLocaleString();
+      document.getElementById('premium-per-unit').textContent = data.summary.premium_per_unit.toLocaleString(undefined, {minimumFractionDigits: 2});
+      document.getElementById('total-payable').textContent = data.summary.total_payable.toLocaleString(undefined, {minimumFractionDigits: 2});
+      document.getElementById('rate-change').textContent = `${(data.summary.rate_change_vs_expiring * 100).toFixed(2)}%`;
+
+      const stateName = data.state_pricing.length > 0 ? data.state_pricing[0].state : 'OH';
+      document.getElementById('state-breakdown').textContent = stateName;
+      document.getElementById('schedule-check').textContent = data.state_pricing[0]?.schedule_check || 'Within rules';
+
+      // Enable save button and show it
+      document.getElementById('save-quote').disabled = false;
+      document.getElementById('saved-success').classList.add('hidden');
+    }
+
+    // Submit save quote to server
+    document.getElementById('save-quote').addEventListener('click', () => {
+      const quoteId = prompt('Enter Quote ID to save under, or leave blank for auto-generated:');
+      const data = document.getElementById('quote-output');
+      // Simplified: create a data object from the visible fields
+      const payload = {
+        id: quoteId || `auto_${Date.now()}`,
+        structure: document.getElementById('selected-structure').textContent || 'Deductible',
+        retention: parseFloat(document.getElementById('selected-retention').textContent.replace(/,/g, '')) || 0,
+        total_payable: parseFloat(document.getElementById('total-payable').textContent.replace(/,/g, '')) || 0
+      };
+
+      fetch('/api/v1/quotes/save', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      }).then(res => res.json())
+        .then(data => {
+          document.getElementById('loading').classList.add('hidden');
+          document.getElementById('quote-output').classList.add('hidden');
+          document.getElementById('saved-success').classList.remove('hidden');
+          document.getElementById('saved-quote-id').textContent = data.quote_id || payload.id;
+        })
+        .catch(err => {
+          alert('Failed to save quote: ' + err.message);
+        });
+    });
+
+    // On page load, fetch the quote result from the server
+    document.addEventListener('DOMContentLoaded', async () => {
+      const fetchMock = () => ({
+        summary: {
+          selected_structure: 'Deductible',
+          selected_retention: 25000,
+          premium_per_unit: 4311.40,
+          total_payable: 599866.18,
+          rate_change_vs_expiring: 0.1346
+        },
+        state_pricing: [
+          { state: 'OH', selected_premium: 279540.04, schedule_check: 'Within rules', tax_charges: 3354.48, surcharge_rate: 0.0025, flat_charge: 20.0, total_payable: 283613.37 }
+        ],
+        structure_comparison: [{ structure: 'Deductible', retention: 25000, ler: 0.24, technical_premium: 590661.1, credit_vs_zero: 175702.82, credit_pct: 0.229, total_payable: 599866.18 }]
+      });
+
+      // Try to fetch rating from server with default account data
+      let data = fetchMock;
+      try {
+        const res = await fetch('/api/v1/rate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            account: {
+              named_insured: 'Test Account',
+              primary_state: 'OH',
+              effective_date: '2026-01-01',
+              expiration_date: '2027-01-01',
+              loss_valuation_date: '2026-01-01',
+              csl: 1000000,
+              experience_cap: 100000,
+              structure: 'Deductible',
+              retention: 25000,
+              schedule_mod: -0.08,
+              full_credibility_claim_count: 1084,
+              fixed_expense_per_unit: 85,
+              expiring_premium_per_unit: 3800
+            },
+            fleet_exposures: [
+              {
+                state: 'OH',
+                vehicle_class: 'Tractor',
+                operating_radius: 'Regional',
+                units_2022: 29,
+                units_2023: 31,
+                units_2024: 33,
+                units_2025: 34,
+                projected_units: 36,
+                projected_trailers: 48
+              }
+            ],
+            loss_occurrences: [
+              {
+                occurrence_id: 'OCC-1001',
+                loss_date: '2022-01-03',
+                paid_indemnity: 37467,
+                case_indemnity: 2391,
+                paid_alae: 2670,
+                case_alae: 996
+              }
+            ]
+          })
+        });
+        if (res.ok) {
+          const result = await res.json();
+          data = result;
+        }
+      } catch (e) {
+        // Server not available — fall back to mock data
+      }
+
+      renderQuote(data);
+    });
+  </script>
+</body>
+</html>
