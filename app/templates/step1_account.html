@@ -26,60 +26,126 @@
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div>
           <label class="block text-sm font-medium text-gray-700 mb-1">Named Insured <span class="text-red-500">*</span></label>
-          <input type="text" name="account.named_insured" class="border border-gray-300 rounded p-2 w-full focus:ring-2 focus:ring-blue-500 outline-none" required placeholder="Buckeye Regional Freight">
+          <input type="text" name="named_insured" class="border border-gray-300 rounded p-2 w-full focus:ring-2 focus:ring-blue-500 outline-none" required placeholder="Buckeye Regional Freight">
         </div>
         <div>
           <label class="block text-sm font-medium text-gray-700 mb-1">Primary State <span class="text-red-500">*</span></label>
-          <select name="account.primary_state" class="border border-gray-300 rounded p-2 w-full focus:ring-2 focus:ring-blue-500 outline-none" required>
+          <select name="primary_state" class="border border-gray-300 rounded p-2 w-full focus:ring-2 focus:ring-blue-500 outline-none" required>
             <option value="">Select state</option>
-            <option value="OH">OH</option>
-            <option value="PA">PA</option>
+            <option value="AL">AL</option>
+            <option value="AK">AK</option>
+            <option value="AZ">AZ</option>
+            <option value="AR">AR</option>
+            <option value="CA">CA</option>
+            <option value="CO">CO</option>
+            <option value="CT">CT</option>
+            <option value="DE">DE</option>
+            <option value="FL">FL</option>
+            <option value="GA">GA</option>
+            <option value="HI">HI</option>
+            <option value="ID">ID</option>
+            <option value="IL">IL</option>
             <option value="IN">IN</option>
+            <option value="IA">IA</option>
+            <option value="KS">KS</option>
+            <option value="KY">KY</option>
+            <option value="LA">LA</option>
+            <option value="ME">ME</option>
+            <option value="MD">MD</option>
+            <option value="MA">MA</option>
+            <option value="MI">MI</option>
+            <option value="MN">MN</option>
+            <option value="MS">MS</option>
+            <option value="MO">MO</option>
+            <option value="MT">MT</option>
+            <option value="NE">NE</option>
+            <option value="NV">NV</option>
+            <option value="NH">NH</option>
+            <option value="NJ">NJ</option>
+            <option value="NM">NM</option>
+            <option value="NY">NY</option>
+            <option value="NC">NC</option>
+            <option value="ND">ND</option>
+            <option value="OH">OH</option>
+            <option value="OK">OK</option>
+            <option value="OR">OR</option>
+            <option value="PA">PA</option>
+            <option value="RI">RI</option>
+            <option value="SC">SC</option>
+            <option value="SD">SD</option>
+            <option value="TN">TN</option>
+            <option value="TX">TX</option>
+            <option value="UT">UT</option>
+            <option value="VT">VT</option>
+            <option value="VA">VA</option>
+            <option value="WA">WA</option>
+            <option value="WV">WV</option>
+            <option value="WI">WI</option>
+            <option value="WY">WY</option>
           </select>
         </div>
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Effective Date <span class="text-red-500">*</span></label>
+          <input type="date" name="effective_date" class="border border-gray-300 rounded p-2 w-full focus:ring-2 focus:ring-blue-500 outline-none" required>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Expiration Date <span class="text-red-500">*</span></label>
+          <input type="date" name="expiration_date" class="border border-gray-300 rounded p-2 w-full focus:ring-2 focus:ring-blue-500 outline-none" required>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Loss Valuation Date <span class="text-red-500">*</span></label>
+          <input type="date" name="loss_valuation_date" class="border border-gray-300 rounded p-2 w-full focus:ring-2 focus:ring-blue-500 outline-none" required>
+        </div>
+        <div></div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div>
           <label class="block text-sm font-medium text-gray-700 mb-1">Structure</label>
-          <select name="account.structure" class="border border-gray-300 rounded p-2 w-full focus:ring-2 focus:ring-blue-500 outline-none">
+          <select name="structure" class="border border-gray-300 rounded p-2 w-full focus:ring-2 focus:ring-blue-500 outline-none">
             <option value="Deductible">Deductible</option>
             <option value="SIR">SIR</option>
           </select>
         </div>
         <div>
           <label class="block text-sm font-medium text-gray-700 mb-1">Retention ($)</label>
-          <input type="number" name="account.retention" class="border border-gray-300 rounded p-2 w-full focus:ring-2 focus:ring-blue-500 outline-none" min="0" value="25000">
+          <input type="number" name="retention" class="border border-gray-300 rounded p-2 w-full focus:ring-2 focus:ring-blue-500 outline-none" min="0" value="25000">
         </div>
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
         <div>
           <label class="block text-sm font-medium text-gray-700 mb-1">CSL ($)</label>
-          <input type="number" name="account.csl" class="border border-gray-300 rounded p-2 w-full focus:ring-2 focus:ring-blue-500 outline-none" min="1" value="1000000">
+          <input type="number" name="csl" class="border border-gray-300 rounded p-2 w-full focus:ring-2 focus:ring-blue-500 outline-none" min="1" value="1000000">
         </div>
         <div>
           <label class="block text-sm font-medium text-gray-700 mb-1">Experience Cap ($)</label>
-          <input type="number" name="account.experience_cap" class="border border-gray-300 rounded p-2 w-full focus:ring-2 focus:ring-blue-500 outline-none" min="1" value="100000">
+          <input type="number" name="experience_cap" class="border border-gray-300 rounded p-2 w-full focus:ring-2 focus:ring-blue-500 outline-none" min="1" value="100000">
         </div>
         <div>
           <label class="block text-sm font-medium text-gray-700 mb-1">Schedule Mod</label>
-          <input type="number" name="account.schedule_mod" class="border border-gray-300 rounded p-2 w-full focus:ring-2 focus:ring-blue-500 outline-none" step="0.01" value="-0.08">
+          <input type="number" name="schedule_mod" class="border border-gray-300 rounded p-2 w-full focus:ring-2 focus:ring-blue-500 outline-none" step="0.01" value="-0.08">
         </div>
         <div>
           <label class="block text-sm font-medium text-gray-700 mb-1">Credibility Std Claims</label>
-          <input type="number" name="account.full_credibility_claim_count" class="border border-gray-300 rounded p-2 w-full focus:ring-2 focus:ring-blue-500 outline-none" min="1" value="1084">
+          <input type="number" name="full_credibility_claim_count" class="border border-gray-300 rounded p-2 w-full focus:ring-2 focus:ring-blue-500 outline-none" min="1" value="1084">
         </div>
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div>
           <label class="block text-sm font-medium text-gray-700 mb-1">Fixed Expense / Unit ($)</label>
-          <input type="number" name="account.fixed_expense_per_unit" class="border border-gray-300 rounded p-2 w-full focus:ring-2 focus:ring-blue-500 outline-none" min="0" value="85">
+          <input type="number" name="fixed_expense_per_unit" class="border border-gray-300 rounded p-2 w-full focus:ring-2 focus:ring-blue-500 outline-none" min="0" value="85">
         </div>
         <div>
           <label class="block text-sm font-medium text-gray-700 mb-1">Expiring Premium / Unit ($)</label>
-          <input type="number" name="account.expiring_premium_per_unit" class="border border-gray-300 rounded p-2 w-full focus:ring-2 focus:ring-blue-500 outline-none" min="0" value="3800">
+          <input type="number" name="expiring_premium_per_unit" class="border border-gray-300 rounded p-2 w-full focus:ring-2 focus:ring-blue-500 outline-none" min="0" value="3800">
         </div>
       </div>
 

@@ -29,6 +29,14 @@ env = Environment(
     autoescape=select_autoescape(),
 )
 
+def comma_filter(value):
+    try:
+        return "{:,.0f}".format(float(value))
+    except (ValueError, TypeError):
+        return str(value)
+
+env.filters["comma"] = comma_filter
+
 app = FastAPI(
     title="Commercial Auto Loss Rating Engine",
     description=(
@@ -76,6 +84,16 @@ async def step3(request: Request) -> HTMLResponse:
 async def step4(request: Request) -> HTMLResponse:
     """Render the fourth step (Review & Rate)."""
     return render_template("step4_results.html", {"request": request})
+
+
+@app.get("/quotes/{quote_id}", response_class=HTMLResponse)
+async def quote_detail(quote_id: str, request: Request) -> HTMLResponse:
+    """Render the detail page for a saved quote."""
+    store = QuoteStore()
+    quote = await store.get_quote(quote_id)
+    if quote is None:
+        return render_template("quotes.html", {"request": request, "not_found": quote_id})
+    return render_template("quote_detail.html", {"request": request, "quote": quote})
 
 
 # ── JSON API endpoints ────────────────────────────────────────────────────
@@ -253,6 +271,14 @@ async def save_quote(payload: Dict[str, Any]) -> Dict[str, Any]:
         return {"quote_id": str(quote_id), "status": "saved"}
     except Exception as exc:
         raise HTTPException(status_code=500, detail=str(exc))
+
+
+@app.get("/quotes", response_class=HTMLResponse)
+async def quotes_list(request: Request) -> HTMLResponse:
+    """List all saved quotes."""
+    store = QuoteStore()
+    quotes = await store.list_quotes(limit=20)
+    return render_template("quotes.html", {"request": request, "quotes": quotes})
 
 
 # ── Health ────────────────────────────────────────────────────────────────

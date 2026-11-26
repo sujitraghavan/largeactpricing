@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quote Detail — Commercial Auto Loss Rating</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/htmx.org@2.0.0"></script>
+  <style>
+    .btn-primary { background: #2563eb; color: white; padding: 0.75rem 1.5rem; border-radius: 0.5rem; border: none; font-weight: 600; cursor: pointer; }
+    .btn-primary:hover { background: #1d4ed8; }
+    .btn-secondary { background: #e5e7eb; color: #374151; padding: 0.75rem 1.5rem; border-radius: 0.5rem; border: none; font-weight: 500; cursor: pointer; }
+    .btn-secondary:hover { background: #d1d5db; }
+  </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+  <nav class="bg-white shadow-sm border-b border-gray-200 px-6 py-4">
+    <h1 class="text-xl font-bold text-gray-800">Commercial Auto Loss Rating</h1>
+    <div class="text-sm text-gray-600 hidden md:block">Quote Detail</div>
+  </nav>
+
+  <div class="max-w-5xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
+    <div class="mb-6">
+      <a href="/quotes" class="btn-secondary">← Back to Quotes</a>
+      <a href="/" class="btn-primary ml-3">New Rating</a>
+    </div>
+
+    <div class="bg-white rounded-xl shadow overflow-hidden">
+      <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
+        <div>
+          <h2 class="text-xl font-bold text-gray-900">Quote {{ quote.id }}</h2>
+          <p class="text-sm text-gray-500">{{ quote.named_insured or '–' }} — {{ quote.primary_state or '–' }}</p>
+        </div>
+        <div class="text-right">
+          <p class="text-2xl font-bold text-gray-900">${{ quote.summary.get('total_payable', 0) | comma }}</p>
+          <p class="text-sm text-gray-500">Total Payable</p>
+        </div>
+      </div>
+
+      <div class="p-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div class="bg-gray-50 p-4 rounded-lg">
+            <p class="text-xs text-gray-500 mb-1">Selected Structure</p>
+            <p class="font-medium">{{ quote.selected_structure or '–' }}</p>
+          </div>
+          <div class="bg-gray-50 p-4 rounded-lg">
+            <p class="text-xs text-gray-500 mb-1">Retention</p>
+            <p class="font-medium">${{ (quote.selected_retention or 0) | comma }}</p>
+          </div>
+          <div class="bg-gray-50 p-4 rounded-lg">
+            <p class="text-xs text-gray-500 mb-1">Total Payable</p>
+            <p class="font-medium text-lg">${{ quote.summary.get('total_payable', 0) | comma }}</p>
+          </div>
+          <div class="bg-gray-50 p-4 rounded-lg">
+            <p class="text-xs text-gray-500 mb-1">Saved</p>
+            <p class="font-medium">{{ quote.created_at or '–' }}</p>
+          </div>
+        </div>
+
+        <h3 class="font-medium text-gray-700 mt-8 mb-4">State Pricing Breakdown</h3>
+        <div class="bg-white border rounded-lg overflow-hidden">
+          <table class="w-full text-sm">
+            <thead class="bg-gray-50 text-gray-600 font-medium">
+              <tr>
+                <th class="px-4 py-3 text-left">State</th>
+                <th class="px-4 py-3 text-left">Selected Premium</th>
+                <th class="px-4 py-3 text-left">Total Payable (State)</th>
+                <th class="px-4 py-3 text-left">Schedule Mod</th>
+                <th class="px-4 py-3 text-left">LCM Applied</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% if quote.state_pricing %}
+                {% for sp in quote.state_pricing %}
+                  <tr>
+                    <td class="px-4 py-3 border-t border-gray-100">{{ sp.state }}</td>
+                    <td class="px-4 py-3 border-t border-gray-100">${{ "{:,.0f}".format(sp.get('selected_premium', 0) or 0) }}</td>
+                    <td class="px-4 py-3 border-t border-gray-100">${{ "{:,.0f}".format(sp.get('total_payable', 0) or 0) }}</td>
+                    <td class="px-4 py-3 border-t border-gray-100">{{ (sp.get('schedule_mod', 0) * 100) | round(2) }}%</td>
+                    <td class="px-4 py-3 border-t border-gray-100">{{ sp.get('applied_lcm', 0) | round(2) }}</td>
+                  </tr>
+                {% endfor %}
+              {% else %}
+                <tr>
+                  <td colspan="5" class="px-4 py-3 border-t border-gray-100 text-gray-400">No state pricing data</td>
+                </tr>
+              {% endif %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

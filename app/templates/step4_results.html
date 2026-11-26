@@ -103,6 +103,12 @@
   </div>
 
   <script>
+    // Module-scope variables (set by DOMContentLoaded below)
+    let currentAccount = null;
+    let currentFleet = null;
+    let currentLosses = null;
+    let ratingResult = null;
+
     // On page load, fetch rating from API with data from sessionStorage
     document.addEventListener('DOMContentLoaded', async () => {
       const savedAccount = sessionStorage.getItem('accountData');
@@ -126,6 +132,8 @@
         expiring_premium_per_unit: 3800
       };
 
+      currentAccount = account;
+
       const fleetExposures = savedFleet ? JSON.parse(savedFleet) : [{
         state: 'OH',
         vehicle_class: 'Heavy truck',
@@ -137,6 +145,7 @@
         projected_units: 36,
         projected_trailers: 48
       }];
+      currentFleet = fleetExposures;
 
       const lossOccurrences = savedLoss ? JSON.parse(savedLoss) : [{
         occurrence_id: 'OCC-1001',
@@ -146,6 +155,7 @@
         paid_alae: 2670,
         case_alae: 996
       }];
+      currentLosses = lossOccurrences;
 
       try {
         const res = await fetch('/api/v1/rate', {
@@ -161,6 +171,9 @@
         if (!res.ok) throw new Error('Rating failed');
 
         const data = await res.json();
+
+        // Store rating result for save handler
+        ratingResult = data;
 
         // Show loading, then render
         document.getElementById('loading').classList.add('hidden');
@@ -192,28 +205,34 @@
     document.getElementById('save-quote').addEventListener('click', () => {
       const quoteId = prompt('Enter Quote ID to save under, or leave blank for auto-generated:');
 
-      // Build payload from visible fields
+      // Build full payload with account data + rating result
       const payload = {
-        id: quoteId || `auto_${Date.now()}`,
-        structure: document.getElementById('selected-structure').textContent || 'Deductible',
-        retention: parseFloat(document.getElementById('selected-retention').textContent.replace(/,/g, '')) || 0,
-        total_payable: parseFloat(document.getElementById('total-payable').textContent.replace(/,/g, '')) || 0
+        account: {
+          ...currentAccount,
+          fleet_exposures: currentFleet,
+          loss_occurrences: currentLosses
+        },
+        result: ratingResult
       };
 
       fetch('/api/v1/quotes/save', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
-      }).then(res => res.json())
-        .then(data => {
-          document.getElementById('loading').classList.add('hidden');
-          document.getElementById('quote-output').classList.add('hidden');
-          document.getElementById('saved-success').classList.remove('hidden');
-          document.getElementById('saved-quote-id').textContent = data.quote_id || payload.id;
-        })
-        .catch(err => {
-          alert('Failed to save quote: ' + err.message);
-        });
+      }).then(async res => {
+        if (!res.ok) {
+          const err = await res.json().catch(() => ({detail: 'Save failed'}));
+          alert('Failed to save quote: ' + (err.detail || 'Unknown error'));
+          return;
+        }
+        const data = await res.json();
+        document.getElementById('loading').classList.add('hidden');
+        document.getElementById('quote-output').classList.add('hidden');
+        document.getElementById('saved-success').classList.remove('hidden');
+        document.getElementById('saved-quote-id').textContent = data.quote_id || payload.account.named_insured || 'Quote';
+      }).catch(err => {
+        alert('Failed to save quote: ' + err.message);
+      });
     });
   </script>
 </body>

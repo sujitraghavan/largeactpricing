@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Saved Quotes — Commercial Auto Loss Rating</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/htmx.org@2.0.0"></script>
+  <style>
+    .btn-primary { background: #2563eb; color: white; padding: 0.75rem 1.5rem; border-radius: 0.5rem; border: none; font-weight: 600; cursor: pointer; }
+    .btn-primary:hover { background: #1d4ed8; }
+    .btn-secondary { background: #e5e7eb; color: #374151; padding: 0.75rem 1.5rem; border-radius: 0.5rem; border: none; font-weight: 500; cursor: pointer; }
+    .btn-secondary:hover { background: #d1d5db; }
+    .quote-card { background: white; border-radius: 0.75rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1); padding: 1rem; margin-bottom: 1rem; border: 1px solid #e5e7eb; }
+    .quote-card:hover { border-color: #3b82f6; }
+  </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+  <nav class="bg-white shadow-sm border-b border-gray-200 px-6 py-4">
+    <h1 class="text-xl font-bold text-gray-800">Commercial Auto Loss Rating</h1>
+    <div class="text-sm text-gray-600 hidden md:block">My Quotes</div>
+  </nav>
+
+  <div class="max-w-6xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
+    <div class="mb-6">
+      <a href="/" class="btn-secondary">← Back to Rating</a>
+      <button id="new-quote" class="btn-primary ml-3">New Rating</button>
+    </div>
+
+    <div class="bg-white rounded-xl shadow overflow-hidden">
+      <div class="px-6 py-4 border-b border-gray-200">
+        <h2 class="text-xl font-bold text-gray-900">Saved Quotes</h2>
+        <p class="text-sm text-gray-500">Click a quote to view details</p>
+      </div>
+
+      <div class="p-6" id="quotes-list">
+        {% if quotes %}
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {% for quote in quotes %}
+              <div class="quote-card">
+                <div class="text-sm">
+                  <p class="font-medium" title="{{ quote.named_insured }}">{{ quote.named_insured | truncate(30) }}</p>
+                  <p class="text-xs text-gray-500">{{ quote.primary_state }}</p>
+                  <p class="text-xs text-gray-400 mt-1">Structure: {{ quote.selected_structure }} | Retention: ${{ quote.selected_retention | comma }}</p>
+                  <p class="text-xs text-gray-400 mt-2">Total: ${{ quote.total_payable | comma }}</p>
+                </div>
+                <div class="mt-3 pt-3 border-t border-gray-100">
+                  <a href="/quotes/{{ quote.id }}" class="text-sm text-blue-600 hover:underline">View</a>
+                  <button class="text-xs text-gray-400 ml-2 hover:text-red-500" onclick="if(confirm('Delete?')) fetch('/api/v1/quotes/{{ quote.id }}', {method: 'DELETE'})">Del</button>
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+        {% else %}
+          <p class="text-center text-gray-500 py-8">No quotes saved yet. Start a new rating to create one.</p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <script>
+    document.getElementById('new-quote').addEventListener('click', () => {
+      window.location.href = '/';
+    });
+  </script>
+</body>
+</html>
