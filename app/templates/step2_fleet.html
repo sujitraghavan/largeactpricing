@@ -21,80 +21,188 @@
     <div class="text-sm text-gray-600 hidden md:block">Step 2 of 4 · Fleet Exposures</div>
   </nav>
 
-  <div class="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
+  <div id="app" class="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
     <h2 class="text-2xl font-bold text-gray-900 mb-2">Fleet Exposure Schedule</h2>
     <p class="text-sm text-gray-500 mb-6">Enter earned power-unit years for historical terms and expected units for the quote period. Trailer counts are descriptive.</p>
 
-    <div class="bg-white rounded-xl shadow border border-gray-200 overflow-hidden mb-6">
-      <table class="w-full text-sm">
-        <thead class="bg-gray-50 text-gray-600 font-medium">
-          <tr>
-            <th class="px-3 py-3 text-left">State</th>
-            <th class="px-3 py-3 text-left">Vehicle Class</th>
-            <th class="px-3 py-3 text-left">Radius</th>
-            <th class="px-3 py-3 text-right">2022</th>
-            <th class="px-3 py-3 text-right">2023</th>
-            <th class="px-3 py-3 text-right">2024</th>
-            <th class="px-3 py-3 text-right">2025</th>
-            <th class="px-3 py-3 text-right">Proj. Units</th>
-            <th class="px-3 py-3 text-right">Proj. Trailers</th>
-            <th class="px-3 py-3 text-center">Action</th>
-          </tr>
-        </thead>
-        <tbody id="fleet-rows" class="divide-y divide-gray-100">
-          <!-- Row template -->
-          <tr class="fleet-row">
-            <td class="px-3 py-2">
-              <select name="fleet.state" class="border rounded p-1.5 w-20 text-sm focus:ring-2 focus:ring-blue-500 outline-none">
-                <option value="OH">OH</option><option value="PA">PA</option><option value="IN">IN</option>
-              </select>
-            </td>
-            <td class="px-3 py-2">
-              <select name="fleet.vehicle_class" class="border rounded p-1.5 w-32 text-sm focus:ring-2 focus:ring-blue-500 outline-none">
-                <option value="Heavy truck">Heavy truck</option>
-                <option value="Tractor">Tractor</option>
-                <option value="Medium truck">Medium truck</option>
-              </select>
-            </td>
-            <td class="px-3 py-2">
-              <select name="fleet.operating_radius" class="border rounded p-1.5 w-28 text-sm focus:ring-2 focus:ring-blue-500 outline-none">
-                <option value="Local">Local</option>
-                <option value="Regional">Regional</option>
-                <option value="Long haul">Long haul</option>
-              </select>
-            </td>
-            <td class="px-3 py-2"><input type="number" name="fleet.units_2022" class="border rounded p-1.5 w-20 text-sm text-right focus:ring-2 focus:ring-blue-500 outline-none" min="0" value="0"></td>
-            <td class="px-3 py-2"><input type="number" name="fleet.units_2023" class="border rounded p-1.5 w-20 text-sm text-right focus:ring-2 focus:ring-blue-500 outline-none" min="0" value="0"></td>
-            <td class="px-3 py-2"><input type="number" name="fleet.units_2024" class="border rounded p-1.5 w-20 text-sm text-right focus:ring-2 focus:ring-blue-500 outline-none" min="0" value="0"></td>
-            <td class="px-3 py-2"><input type="number" name="fleet.units_2025" class="border rounded p-1.5 w-20 text-sm text-right focus:ring-2 focus:ring-blue-500 outline-none" min="0" value="0"></td>
-            <td class="px-3 py-2"><input type="number" name="fleet.projected_units" class="border rounded p-1.5 w-20 text-sm text-right focus:ring-2 focus:ring-blue-500 outline-none" min="0" value="0"></td>
-            <td class="px-3 py-2"><input type="number" name="fleet.projected_trailers" class="border rounded p-1.5 w-24 text-sm text-right focus:ring-2 focus:ring-blue-500 outline-none" min="0" value="0"></td>
-            <td class="px-3 py-2 text-center"><button class="btn-danger" onclick="this.closest('tr').remove()">Remove</button></td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
+    <form id="fleet-form" class="bg-white p-6 rounded-xl shadow border border-gray-200 space-y-4">
+      <!-- Hidden account fields from step 1 -->
+      <div id="account-hidden-fields"></div>
 
-    <div class="flex gap-4 mb-6">
-      <button class="btn-secondary" onclick="addFleetRow()">+ Add Row</button>
-    </div>
+      <div class="bg-white rounded-xl shadow border border-gray-200 overflow-hidden mb-6">
+        <table class="w-full text-sm">
+          <thead class="bg-gray-50 text-gray-600 font-medium">
+            <tr>
+              <th class="px-3 py-3 text-left">State</th>
+              <th class="px-3 py-3 text-left">Vehicle Class</th>
+              <th class="px-3 py-3 text-left">Radius</th>
+              <th class="px-3 py-3 text-right">2022</th>
+              <th class="px-3 py-3 text-right">2023</th>
+              <th class="px-3 py-3 text-right">2024</th>
+              <th class="px-3 py-3 text-right">2025</th>
+              <th class="px-3 py-3 text-right">Proj. Units</th>
+              <th class="px-3 py-3 text-right">Proj. Trailers</th>
+              <th class="px-3 py-3 text-center">Action</th>
+            </tr>
+          </thead>
+          <tbody id="fleet-rows" class="divide-y divide-gray-100">
+            <!-- Row template -->
+            <tr class="fleet-row">
+              <td class="px-3 py-2">
+                <select name="fleet[0].state" class="border rounded p-1.5 w-20 text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+                  <option value="OH">OH</option><option value="PA">PA</option><option value="IN">IN</option>
+                </select>
+              </td>
+              <td class="px-3 py-2">
+                <select name="fleet[0].vehicle_class" class="border rounded p-1.5 w-32 text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+                  <option value="Heavy truck">Heavy truck</option>
+                  <option value="Tractor">Tractor</option>
+                  <option value="Medium truck">Medium truck</option>
+                </select>
+              </td>
+              <td class="px-3 py-2">
+                <select name="fleet[0].operating_radius" class="border rounded p-1.5 w-28 text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+                  <option value="Local">Local</option>
+                  <option value="Regional">Regional</option>
+                  <option value="Long haul">Long haul</option>
+                </select>
+              </td>
+              <td class="px-3 py-2"><input type="number" name="fleet[0].units_2022" class="border rounded p-1.5 w-20 text-sm text-right focus:ring-2 focus:ring-blue-500 outline-none" min="0" value="0"></td>
+              <td class="px-3 py-2"><input type="number" name="fleet[0].units_2023" class="border rounded p-1.5 w-20 text-sm text-right focus:ring-2 focus:ring-blue-500 outline-none" min="0" value="0"></td>
+              <td class="px-3 py-2"><input type="number" name="fleet[0].units_2024" class="border rounded p-1.5 w-20 text-sm text-right focus:ring-2 focus:ring-blue-500 outline-none" min="0" value="0"></td>
+              <td class="px-3 py-2"><input type="number" name="fleet[0].units_2025" class="border rounded p-1.5 w-20 text-sm text-right focus:ring-2 focus:ring-blue-500 outline-none" min="0" value="0"></td>
+              <td class="px-3 py-2"><input type="number" name="fleet[0].projected_units" class="border rounded p-1.5 w-20 text-sm text-right focus:ring-2 focus:ring-blue-500 outline-none" min="0" value="0"></td>
+              <td class="px-3 py-2"><input type="number" name="fleet[0].projected_trailers" class="border rounded p-1.5 w-24 text-sm text-right focus:ring-2 focus:ring-blue-500 outline-none" min="0" value="0"></td>
+              <td class="px-3 py-2 text-center"><button type="button" class="btn-danger" onclick="this.closest('tr').remove(); updateFleetNames();">Remove</button></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
 
-    <form hx-get="/step/3" hx-target="#app" hx-swap="innerHTML" class="bg-white p-6 rounded-xl shadow border border-gray-200 space-y-4">
-      <!-- Hidden account inputs are carried via JS or user re-edits -->
+      <div class="flex gap-4 mb-6">
+        <button type="button" class="btn-secondary" onclick="addFleetRow()">+ Add Row</button>
+      </div>
+
       <div class="flex justify-between items-center pt-4">
         <button type="button" class="btn-secondary" onclick="history.back()">← Back</button>
-        <button type="submit" class="btn-primary">Next: Loss Run →</button>
+        <button type="button" id="next-btn" class="btn-primary">Next: Loss Run →</button>
       </div>
     </form>
   </div>
 
   <script>
-    function addFleetRow() {
+    let fleetRowIndex = 0;
+
+    // Load saved fleet data and account data on page load
+    document.addEventListener('DOMContentLoaded', () => {
+      // Restore account hidden fields
+      const accountData = sessionStorage.getItem('accountData');
+      if (accountData) {
+        const data = JSON.parse(accountData);
+        const container = document.getElementById('account-hidden-fields');
+        Object.entries(data).forEach(([key, value]) => {
+          const input = document.createElement('input');
+          input.type = 'hidden';
+          input.name = key;
+          input.value = value;
+          container.appendChild(input);
+        });
+      }
+
+      // Restore fleet rows
+      const savedFleet = sessionStorage.getItem('fleetData');
+      if (savedFleet) {
+        const rows = JSON.parse(savedFleet);
+        if (rows.length > 0) {
+          // Clear default empty row
+          document.getElementById('fleet-rows').innerHTML = '';
+          rows.forEach((row, i) => {
+            addFleetRow(row, i);
+          });
+          fleetRowIndex = rows.length;
+        }
+      }
+    });
+
+    function addFleetRow(data = null, index = null) {
       const tbody = document.getElementById('fleet-rows');
-      const template = tbody.querySelector('.fleet-row').cloneNode(true);
-      template.querySelectorAll('input').forEach(inp => inp.value = '0');
+      const idx = index !== null ? index : fleetRowIndex++;
+      const template = document.createElement('tr');
+      template.className = 'fleet-row';
+      template.innerHTML = `
+        <td class="px-3 py-2">
+          <select name="fleet[${idx}].state" class="border rounded p-1.5 w-20 text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+            <option value="OH">OH</option><option value="PA">PA</option><option value="IN">IN</option>
+          </select>
+        </td>
+        <td class="px-3 py-2">
+          <select name="fleet[${idx}].vehicle_class" class="border rounded p-1.5 w-32 text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+            <option value="Heavy truck">Heavy truck</option>
+            <option value="Tractor">Tractor</option>
+            <option value="Medium truck">Medium truck</option>
+          </select>
+        </td>
+        <td class="px-3 py-2">
+          <select name="fleet[${idx}].operating_radius" class="border rounded p-1.5 w-28 text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+            <option value="Local">Local</option>
+            <option value="Regional">Regional</option>
+            <option value="Long haul">Long haul</option>
+          </select>
+        </td>
+        <td class="px-3 py-2"><input type="number" name="fleet[${idx}].units_2022" class="border rounded p-1.5 w-20 text-sm text-right focus:ring-2 focus:ring-blue-500 outline-none" min="0" value="${data?.units_2022 || 0}"></td>
+        <td class="px-3 py-2"><input type="number" name="fleet[${idx}].units_2023" class="border rounded p-1.5 w-20 text-sm text-right focus:ring-2 focus:ring-blue-500 outline-none" min="0" value="${data?.units_2023 || 0}"></td>
+        <td class="px-3 py-2"><input type="number" name="fleet[${idx}].units_2024" class="border rounded p-1.5 w-20 text-sm text-right focus:ring-2 focus:ring-blue-500 outline-none" min="0" value="${data?.units_2024 || 0}"></td>
+        <td class="px-3 py-2"><input type="number" name="fleet[${idx}].units_2025" class="border rounded p-1.5 w-20 text-sm text-right focus:ring-2 focus:ring-blue-500 outline-none" min="0" value="${data?.units_2025 || 0}"></td>
+        <td class="px-3 py-2"><input type="number" name="fleet[${idx}].projected_units" class="border rounded p-1.5 w-20 text-sm text-right focus:ring-2 focus:ring-blue-500 outline-none" min="0" value="${data?.projected_units || 0}"></td>
+        <td class="px-3 py-2"><input type="number" name="fleet[${idx}].projected_trailers" class="border rounded p-1.5 w-24 text-sm text-right focus:ring-2 focus:ring-blue-500 outline-none" min="0" value="${data?.projected_trailers || 0}"></td>
+        <td class="px-3 py-2 text-center"><button type="button" class="btn-danger" onclick="this.closest('tr').remove(); updateFleetNames();">Remove</button></td>
+      `;
       tbody.appendChild(template);
+      if (data) {
+        template.querySelector(`[name="fleet[${idx}].state"]`).value = data.state || 'OH';
+        template.querySelector(`[name="fleet[${idx}].vehicle_class"]`).value = data.vehicle_class || 'Heavy truck';
+        template.querySelector(`[name="fleet[${idx}].operating_radius"]`).value = data.operating_radius || 'Local';
+      }
     }
+
+    function updateFleetNames() {
+      const rows = document.querySelectorAll('#fleet-rows .fleet-row');
+      rows.forEach((row, i) => {
+        row.querySelectorAll('select, input').forEach(el => {
+          const name = el.name.replace(/fleet\[\d+\]\./, `fleet[${i}].`);
+          el.name = name;
+        });
+      });
+      fleetRowIndex = rows.length;
+    }
+
+    // Save and navigate on Next click
+    document.getElementById('next-btn').addEventListener('click', () => {
+      const form = document.getElementById('fleet-form');
+      const formData = new FormData(form);
+      const fleetData = [];
+
+      // Parse fleet array from form data
+      const fleetMap = {};
+      for (const [key, value] of formData.entries()) {
+        if (key.startsWith('fleet[')) {
+          const match = key.match(/fleet\[(\d+)\]\.(.+)/);
+          if (match) {
+            const idx = match[1];
+            const field = match[2];
+            if (!fleetMap[idx]) fleetMap[idx] = {};
+            fleetMap[idx][field] = value;
+          }
+        }
+      }
+      // Convert map to array in order
+      Object.keys(fleetMap).sort((a, b) => a - b).forEach(idx => {
+        fleetData.push(fleetMap[idx]);
+      });
+
+      sessionStorage.setItem('fleetData', JSON.stringify(fleetData));
+      window.location.href = '/step/3';
+    });
   </script>
 </body>
 </html>

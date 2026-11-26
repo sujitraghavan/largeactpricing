@@ -19,36 +19,34 @@
     <div class="text-sm text-gray-600 hidden md:block">Step 3 of 4 · Loss Run</div>
   </nav>
 
-  <div class="max-w-2xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
+  <div id="app" class="max-w-2xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
     <h2 class="text-2xl font-bold text-gray-900 mb-2">Occurrence Loss Run</h2>
     <p class="text-sm text-gray-500 mb-6">Enter one ground-up occurrence per row including zero-dollar claims. Upload CSV/Excel or use template below.</p>
 
     <!-- Upload area -->
-    <form hx-post="/api/v1/loss-run/upload" hx-target="#upload-result" hx-swap="innerHTML" class="bg-white p-6 rounded-xl shadow border border-gray-200 mb-6">
+    <form id="upload-form" class="bg-white p-6 rounded-xl shadow border border-gray-200 mb-6">
       <div class="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center mb-4">
         <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88 7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path></svg>
         <p class="mt-2 text-gray-600">Drag & drop or <a href="#" class="text-blue-600 hover:underline" id="file-trigger">browse files</a></p>
         <p class="text-xs text-gray-400 mt-1">CSV or Excel (.xlsx) — Max 10MB</p>
-        <input type="file" name="file" id="file-input" accept=".csv,.xlsx" class="hidden" hx-on:change="document.getElementById('file-name').textContent = this.files[0]?.name || ''">
+        <input type="file" name="file" id="file-input" accept=".csv,.xlsx" class="hidden">
       </div>
 
       <div id="file-name" class="text-sm text-gray-500 mb-4"></div>
 
       <div class="flex gap-4">
         <input type="hidden" name="account_id" value="temp-account">
-        <button type="submit" class="btn-primary" disabled id="upload-btn">Upload & Parse</button>
+        <button type="button" class="btn-primary" disabled id="upload-btn">Upload & Parse</button>
         <a href="/api/v1/loss-run/template" download="loss_run_template.xlsx" class="btn-secondary">Download Template</a>
       </div>
     </form>
 
     <div id="upload-result" class="bg-white p-4 rounded-lg shadow border border-gray-200 hidden"></div>
 
-    <!-- Next step button (enabled after upload) -->
+    <!-- Next step button -->
     <div class="flex justify-between items-center pt-6">
       <button class="btn-secondary" onclick="history.back()">← Back</button>
-      <form hx-get="/step/4" hx-target="#app" hx-swap="innerHTML" class="flex">
-        <button type="submit" class="btn-primary" id="next-btn" disabled>Next: Review & Rate →</button>
-      </form>
+      <button class="btn-primary" id="next-btn">Next: Review & Rate →</button>
     </div>
 
   </div>
@@ -58,6 +56,7 @@
     const fileTrigger = document.getElementById('file-trigger');
     const uploadBtn = document.getElementById('upload-btn');
     const nextBtn = document.getElementById('next-btn');
+    let lossOccurrences = [];
 
     fileTrigger.addEventListener('click', e => { e.preventDefault(); fileInput.click(); });
     fileInput.addEventListener('change', () => {
@@ -65,6 +64,55 @@
       document.getElementById('file-name').textContent = name || '';
       uploadBtn.disabled = !name;
     });
+
+    uploadBtn.addEventListener('click', async () => {
+      if (!fileInput.files[0]) return;
+
+      const formData = new FormData();
+      formData.append('file', fileInput.files[0]);
+      formData.append('account_id', 'temp-account');
+
+      try {
+        const res = await fetch('/api/v1/loss-run/upload', {
+          method: 'POST',
+          body: formData
+        });
+        const data = await res.json();
+
+        const resultDiv = document.getElementById('upload-result');
+        resultDiv.classList.remove('hidden');
+        resultDiv.classList.add('bg-green-50', 'border-l-4', 'border-green-500', 'text-green-800', 'p-4', 'rounded-xl');
+
+        if (data.errors && data.errors.length > 0) {
+          resultDiv.classList.remove('border-green-500');
+          resultDiv.classList.add('border-red-500', 'text-red-800', 'bg-red-50');
+          resultDiv.innerHTML = `<p class="font-medium">Upload had ${data.errors.length} error(s):</p><ul class="text-sm mt-1">${data.errors.map(e => `<li>${e}</li>`).join('')}</ul>`;
+          nextBtn.disabled = true;
+        } else {
+          resultDiv.innerHTML = `<p class="font-medium">Parsed ${data.parsed_count} occurrence(s) successfully.</p>`;
+          lossOccurrences = data.occurrences;
+          sessionStorage.setItem('lossOccurrences', JSON.stringify(lossOccurrences));
+          nextBtn.disabled = false;
+        }
+      } catch (err) {
+        alert('Upload failed: ' + err.message);
+      }
+    });
+
+    nextBtn.addEventListener('click', () => {
+      window.location.href = '/step/4';
+    });
+
+    // Restore previously uploaded loss data
+    const savedLoss = sessionStorage.getItem('lossOccurrences');
+    if (savedLoss) {
+      lossOccurrences = JSON.parse(savedLoss);
+      const resultDiv = document.getElementById('upload-result');
+      resultDiv.classList.remove('hidden');
+      resultDiv.classList.add('bg-green-50', 'border-l-4', 'border-green-500', 'text-green-800', 'p-4', 'rounded-xl');
+      resultDiv.innerHTML = `<p class="font-medium">Loaded ${lossOccurrences.length} previously uploaded occurrence(s).</p>`;
+      nextBtn.disabled = false;
+    }
   </script>
 </body>
 </html>
