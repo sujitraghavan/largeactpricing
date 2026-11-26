@@ -8,7 +8,7 @@ from typing import Any, Dict, List
 
 from fastapi import FastAPI, File, Form, HTTPException, Request, UploadFile
 from fastapi.responses import HTMLResponse, Response
-from fastapi.templating import Jinja2Templates
+from jinja2 import Environment, FileSystemLoader, select_autoescape
 
 from app.models import AccountTermsIn, RateRequest
 from app.services.quote_store import QuoteStore
@@ -23,7 +23,12 @@ from app.services.rating_engine import (
     quote_result_to_dict,
 )
 
-templates = Jinja2Templates(directory="app/templates")
+# ── Direct Jinja2 environment (bypasses Starlette TemplateResponse bugs on Python 3.14) ──
+env = Environment(
+    loader=FileSystemLoader("app/templates"),
+    autoescape=select_autoescape(),
+)
+
 app = FastAPI(
     title="Commercial Auto Loss Rating Engine",
     description=(
@@ -39,31 +44,38 @@ async def on_startup() -> None:
     return None
 
 
+def render_template(name: str, context: Dict[str, Any]) -> HTMLResponse:
+    """Render a template using Jinja2 directly, bypassing Starlette's TemplateResponse."""
+    template = env.get_template(name)
+    html = template.render(**context)
+    return HTMLResponse(html)
+
+
 # ── HTMX UI routes ────────────────────────────────────────────────────────
 
 
 @app.get("/", response_class=HTMLResponse)
 async def step1(request: Request) -> HTMLResponse:
     """Render the first step (Account Terms)."""
-    return templates.TemplateResponse("step1_account.html", {"request": request})
+    return render_template("step1_account.html", {"request": request})
 
 
 @app.get("/step/2", response_class=HTMLResponse)
 async def step2(request: Request) -> HTMLResponse:
     """Render the second step (Fleet Exposures)."""
-    return templates.TemplateResponse("step2_fleet.html", {"request": request})
+    return render_template("step2_fleet.html", {"request": request})
 
 
 @app.get("/step/3", response_class=HTMLResponse)
 async def step3(request: Request) -> HTMLResponse:
     """Render the third step (Loss Run)."""
-    return templates.TemplateResponse("step3_loss_run.html", {"request": request})
+    return render_template("step3_loss_run.html", {"request": request})
 
 
 @app.get("/step/4", response_class=HTMLResponse)
 async def step4(request: Request) -> HTMLResponse:
     """Render the fourth step (Review & Rate)."""
-    return templates.TemplateResponse("step4_results.html", {"request": request})
+    return render_template("step4_results.html", {"request": request})
 
 
 # ── JSON API endpoints ────────────────────────────────────────────────────
