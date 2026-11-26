@@ -21,10 +21,11 @@ class Settings(BaseSettings):
     # Supabase
     supabase_url: str = os.getenv("SUPABASE_URL", "")
     supabase_key: str = os.getenv("SUPABASE_KEY", "")
+    supabase_db_password: str = os.getenv("SUPABASE_DB_PASSWORD", "")
     supabase_db_url: str = os.getenv(
         "SUPABASE_DB_URL",
         f"postgresql+asyncpg://postgres:{os.getenv('SUPABASE_DB_PASSWORD', '')}"
-        f"@{os.getenv('SUPABASE_DB_HOST', 'db.wwbzdwzzfhrhsifqcvtm.supabase.co')}"
+        f"@{os.getenv('SUPABASE_DB_HOST', 'db.quilgtlvmtdsqoxbzeeo.supabase.co')}"
         f":5432/postgres",
     )
 
@@ -41,6 +42,7 @@ class Settings(BaseSettings):
         env_file = ".env"
         env_file_encoding = "utf-8"
         case_sensitive = False
+        extra = "allow"
 
 
 settings = Settings()
